@@ -1,0 +1,258 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String            @id @default(uuid())
+  email             String            @unique
+  passwordHash      String
+  firstName         String
+  lastName          String
+  phoneNumber       String?
+  profileImageUrl   String?
+  timeZone          String
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  
+  // Relations
+  bandMembers       BandMember[]
+  createdBands      Band[]            @relation("BandCreator")
+  rehearsalCreator  Rehearsal[]       @relation("RehearsalCreator")
+  locationCreator   Location[]        @relation("LocationCreator")
+  attendance        Attendance[]
+  pollResponses     PollResponse[]
+  createdPolls      AvailabilityPoll[] @relation("PollCreator")
+  rehearsalNotes    RehearsalNote[]   @relation("NoteCreator")
+  notifications     Notification[]
+}
+
+model Band {
+  id                String            @id @default(uuid())
+  name              String
+  description       String?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  createdById       String
+  
+  // Relations
+  createdBy         User              @relation("BandCreator", fields: [createdById], references: [id])
+  members           BandMember[]
+  rehearsals        Rehearsal[]
+  availabilityPolls AvailabilityPoll[]
+}
+
+model BandMember {
+  id                String            @id @default(uuid())
+  bandId            String
+  userId            String
+  role              Role
+  joinedAt          DateTime          @default(now())
+  status            MemberStatus
+  
+  // Relations
+  band              Band              @relation(fields: [bandId], references: [id])
+  user              User              @relation(fields: [userId], references: [id])
+  
+  @@unique([bandId, userId])
+}
+
+model Rehearsal {
+  id                String            @id @default(uuid())
+  bandId            String
+  title             String
+  startTime         DateTime
+  endTime           DateTime
+  locationId        String?
+  notes             String?
+  createdById       String
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  status            RehearsalStatus
+  isRecurring       Boolean           @default(false)
+  recurringPatternId String?
+  
+  // Relations
+  band              Band              @relation(fields: [bandId], references: [id])
+  location          Location?         @relation(fields: [locationId], references: [id])
+  createdBy         User              @relation("RehearsalCreator", fields: [createdById], references: [id])
+  recurringPattern  RecurringPattern? @relation(fields: [recurringPatternId], references: [id])
+  attendance        Attendance[]
+  rehearsalNotes    RehearsalNote[]
+}
+
+model RecurringPattern {
+  id                String            @id @default(uuid())
+  frequency         RecurringFrequency
+  dayOfWeek         Int?              // 0-6 (Sunday to Saturday)
+  dayOfMonth        Int?              // 1-31
+  startDate         DateTime
+  endDate           DateTime?
+  timesOfDay        Json              // Array of start/end times for the recurring event
+  
+  // Relations
+  rehearsals        Rehearsal[]
+}
+
+model Location {
+  id                String            @id @default(uuid())
+  name              String
+  address           String
+  city              String
+  state             String
+  zipCode           String
+  country           String
+  latitude          Float?
+  longitude         Float?
+  notes             String?
+  createdById       String
+  
+  // Relations
+  createdBy         User              @relation("LocationCreator", fields: [createdById], references: [id])
+  rehearsals        Rehearsal[]
+}
+
+model Attendance {
+  id                String            @id @default(uuid())
+  rehearsalId       String
+  userId            String
+  status            AttendanceStatus
+  responseTime      DateTime?
+  notes             String?
+  
+  // Relations
+  rehearsal         Rehearsal         @relation(fields: [rehearsalId], references: [id])
+  user              User              @relation(fields: [userId], references: [id])
+  
+  @@unique([rehearsalId, userId])
+}
+
+model AvailabilityPoll {
+  id                String            @id @default(uuid())
+  bandId            String
+  title             String
+  description       String?
+  expiresAt         DateTime
+  createdById       String
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  status            PollStatus
+  
+  // Relations
+  band              Band              @relation(fields: [bandId], references: [id])
+  createdBy         User              @relation("PollCreator", fields: [createdById], references: [id])
+  pollOptions       PollOption[]
+}
+
+model PollOption {
+  id                String            @id @default(uuid())
+  pollId            String
+  startTime         DateTime
+  endTime           DateTime
+  
+  // Relations
+  poll              AvailabilityPoll  @relation(fields: [pollId], references: [id])
+  responses         PollResponse[]
+}
+
+model PollResponse {
+  id                String            @id @default(uuid())
+  pollOptionId      String
+  userId            String
+  availability      AvailabilityStatus
+  responseTime      DateTime          @default(now())
+  
+  // Relations
+  pollOption        PollOption        @relation(fields: [pollOptionId], references: [id])
+  user              User              @relation(fields: [userId], references: [id])
+  
+  @@unique([pollOptionId, userId])
+}
+
+model RehearsalNote {
+  id                String            @id @default(uuid())
+  rehearsalId       String
+  content           String
+  createdById       String
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  
+  // Relations
+  rehearsal         Rehearsal         @relation(fields: [rehearsalId], references: [id])
+  createdBy         User              @relation("NoteCreator", fields: [createdById], references: [id])
+}
+
+model Notification {
+  id                String            @id @default(uuid())
+  userId            String
+  type              NotificationType
+  content           Json
+  isRead            Boolean           @default(false)
+  createdAt         DateTime          @default(now())
+  relatedEntityId   String?
+  
+  // Relations
+  user              User              @relation(fields: [userId], references: [id])
+}
+
+enum Role {
+  ADMIN
+  MEMBER
+  SUBSTITUTE
+}
+
+enum MemberStatus {
+  ACTIVE
+  INACTIVE
+  INVITED
+}
+
+enum RehearsalStatus {
+  SCHEDULED
+  CANCELLED
+  COMPLETED
+}
+
+enum AttendanceStatus {
+  ATTENDING
+  MAYBE
+  NOT_ATTENDING
+  NO_RESPONSE
+}
+
+enum PollStatus {
+  OPEN
+  CLOSED
+}
+
+enum AvailabilityStatus {
+  AVAILABLE
+  MAYBE
+  UNAVAILABLE
+}
+
+enum RecurringFrequency {
+  DAILY
+  WEEKLY
+  BIWEEKLY
+  MONTHLY
+}
+
+enum NotificationType {
+  REHEARSAL_SCHEDULED
+  REHEARSAL_CHANGED
+  REHEARSAL_REMINDER
+  REHEARSAL_CANCELLED
+  POLL_CREATED
+  POLL_REMINDER
+  POLL_CLOSED
+  BAND_INVITATION
+  MEMBER_JOINED
+}
