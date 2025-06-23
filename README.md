@@ -1,172 +1,125 @@
 # Music Rehearsal Scheduler
 
-A comprehensive web application for scheduling band rehearsals, sending reminders, tracking attendance, and suggesting optimal rehearsal times based on member availability.
+A comprehensive web application designed to streamline the process of scheduling and managing band rehearsals. This application helps bands and music groups coordinate rehearsal times, track attendance, send automated reminders, and suggest optimal rehearsal times based on member availability patterns.
 
-## Features
+## Key Features
 
-- **User Authentication System** - Secure login with role-based access
-- **Band/Group Management** - Create and manage multiple bands with different members
-- **Availability Polling** - Find the best rehearsal times that work for everyone
-- **Schedule Management** - Create one-time or recurring rehearsals
-- **Smart Scheduling** - Algorithm suggests optimal rehearsal times based on member availability
-- **Notification System** - Email and in-app reminders for upcoming rehearsals
-- **Attendance Tracking** - Keep records of who attends each rehearsal
-- **Location Management** - Save and organize rehearsal venues
-- **Rehearsal Notes** - Share agendas and track progress
-- **Calendar Integration** - Sync with Google Calendar, Apple Calendar, and Outlook
+- **User and Band Management**
+  - User registration and profile management
+  - Band/group creation and member invitation system
+  - Role-based permissions (admin, member, guest)
+
+- **Calendar and Scheduling**
+  - Visual calendar interface with month, week, and day views
+  - Recurring event creation
+  - Integration with external calendars (Google, Apple, Outlook)
+  - Availability polling system
+
+- **Attendance Tracking**
+  - RSVP functionality for each event
+  - Attendance history and analytics
+  - Substitute musician management
+
+- **Smart Scheduling**
+  - Automated optimal time suggestions based on historical availability
+  - Conflict detection and resolution
+  - Venue availability integration
+
+- **Communication Tools**
+  - In-app messaging and comments
+  - Email and SMS notifications
+  - Customizable reminder system
+
+- **Resource Management**
+  - Equipment tracking and assignments
+  - Rehearsal space booking integration
+  - Setlist management and sharing
 
 ## Technology Stack
 
 ### Frontend
-- React.js with TypeScript
-- Redux for state management
-- Material-UI components
-- FullCalendar.js for calendar visualization
+- React.js with Next.js for server-side rendering
+- Material-UI for consistent design components
+- Redux for application state
+- FullCalendar.js for interactive calendar views
 - Formik with Yup validation
-- Axios for API requests
 
 ### Backend
 - Node.js with Express
-- JWT authentication with OAuth integration
-- Prisma ORM
-- PostgreSQL database
-- Redis for caching
-- RESTful API with Swagger documentation
+- MongoDB for flexible schema design
+- JWT with OAuth integration for social logins
+- SendGrid for email notifications
+- Twilio for text reminders
+- Google Calendar API, Apple Calendar API
 
-### DevOps
-- Docker containerization
+### Infrastructure
+- AWS or Vercel for web application
+- MongoDB Atlas
 - GitHub Actions for CI/CD
-- AWS deployment (ECS, RDS, S3)
-- New Relic/Datadog monitoring
+- Sentry for error tracking
+- Google Analytics
 
 ## Getting Started
 
 ### Prerequisites
-
-- Node.js (v16+)
-- npm or Yarn
-- Docker and Docker Compose
-- PostgreSQL
-- Redis
+- Node.js (v14 or higher)
+- npm (v6 or higher)
+- MongoDB (v4 or higher)
 
 ### Installation
 
-1. Clone the repository:
-   ```
-   git clone https://github.com/dxaginfo/music-rehearsal-scheduler-2025.git
-   cd music-rehearsal-scheduler-2025
-   ```
-
-2. Install dependencies:
-   ```
-   # Install backend dependencies
-   cd backend
-   npm install
-
-   # Install frontend dependencies
-   cd ../frontend
-   npm install
-   ```
-
-3. Set up environment variables:
-   ```
-   # Backend .env file
-   cp backend/.env.example backend/.env
-   # Edit the .env file with your database credentials and other configurations
-
-   # Frontend .env file
-   cp frontend/.env.example frontend/.env
-   ```
-
-4. Start the development servers:
-   ```
-   # Start backend server
-   cd backend
-   npm run dev
-
-   # Start frontend server
-   cd ../frontend
-   npm start
-   ```
-
-5. Access the application:
-   - Backend API: http://localhost:4000
-   - Frontend: http://localhost:3000
-
-### Docker Deployment
-
-1. Build and start the containers:
-   ```
-   docker-compose up -d
-   ```
-
-2. Access the application at http://localhost:3000
-
-## Project Structure
-
-```
-music-rehearsal-scheduler/
-├── backend/                 # Node.js/Express backend
-│   ├── src/
-│   │   ├── config/          # Configuration files
-│   │   ├── controllers/     # Request handlers
-│   │   ├── middleware/      # Express middleware
-│   │   ├── models/          # Prisma models
-│   │   ├── routes/          # API routes
-│   │   ├── services/        # Business logic
-│   │   ├── utils/           # Utility functions
-│   │   └── index.js         # Entry point
-│   ├── prisma/              # Prisma schema and migrations
-│   └── tests/               # Backend tests
-├── frontend/                # React frontend
-│   ├── public/              # Static files
-│   ├── src/
-│   │   ├── assets/          # Images, fonts, etc.
-│   │   ├── components/      # Reusable components
-│   │   ├── hooks/           # Custom React hooks
-│   │   ├── pages/           # Page components
-│   │   ├── redux/           # Redux store configuration
-│   │   ├── services/        # API service calls
-│   │   ├── styles/          # Global styles
-│   │   ├── types/           # TypeScript type definitions
-│   │   ├── utils/           # Utility functions
-│   │   └── App.tsx          # Root component
-│   └── tests/               # Frontend tests
-├── docker/                  # Docker configuration
-├── .github/                 # GitHub Actions workflows
-├── docs/                    # Documentation
-└── README.md                # Project overview
+1. Clone the repository
+```bash
+git clone https://github.com/dxaginfo/music-rehearsal-scheduler-2025.git
+cd music-rehearsal-scheduler-2025
 ```
 
-## API Documentation
+2. Install dependencies
+```bash
+# Install backend dependencies
+cd server
+npm install
 
-API documentation is available at `/api/docs` when running the backend server.
+# Install frontend dependencies
+cd ../client
+npm install
+```
 
-## Database Schema
+3. Set up environment variables
+```bash
+# In the server directory, create a .env file with the following variables
+MONGODB_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
+SENDGRID_API_KEY=your_sendgrid_api_key
+TWILIO_ACCOUNT_SID=your_twilio_account_sid
+TWILIO_AUTH_TOKEN=your_twilio_auth_token
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+```
 
-The application uses a PostgreSQL database with the following main tables:
+4. Start the development servers
+```bash
+# Start the backend server
+cd server
+npm run dev
 
-- Users - User accounts and authentication
-- Bands - Band/group information
-- BandMembers - Relationship between users and bands
-- Rehearsals - Scheduled rehearsals
-- Attendance - Attendance records for rehearsals
-- Locations - Rehearsal venues
-- AvailabilityPolls - Polls for determining availability
-- RehearsalNotes - Notes and agendas for rehearsals
+# In a separate terminal, start the frontend server
+cd client
+npm run dev
+```
+
+5. Access the application at http://localhost:3000
 
 ## Contributing
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+We welcome contributions to the Music Rehearsal Scheduler project! Please read our [Contributing Guidelines](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Contact
+## Acknowledgments
 
-Project Link: [https://github.com/dxaginfo/music-rehearsal-scheduler-2025](https://github.com/dxaginfo/music-rehearsal-scheduler-2025)
+- The developers of the React, Node.js, and MongoDB ecosystems
+- The music community for inspiring this project
+- All contributors who have helped shape this application
